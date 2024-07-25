@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='catNmapAndCensysToTable',
@@ -8,6 +8,14 @@ setup(
     author='Sylvain Júlio',
     author_email='syjulio123@gmail.com',
     license='unlicense',
-    packages=['catNmapAndCensysToTable'],
-    zip_safe=False
+    packages=find_packages(),  # Automatically finds all packages in the directory
+    zip_safe=False,
+    install_requires=[
+        'tabulate',  # Ensures that the tabulate library is installed
+    ],
+    entry_points={
+        'console_scripts': [
+            'catNmapAndCensysToTable=catNmapAndCensysToTable:main'
+        ]
+    }
 )
