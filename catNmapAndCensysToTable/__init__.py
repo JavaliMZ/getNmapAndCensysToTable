@@ -96,27 +96,31 @@ def print_table(data):
     # print(tabulate(table, headers=headers, tablefmt='simple', numalign="left"))
     print(tabulate(table, tablefmt='plain', numalign="left"))
 
-def main():
+def get_files_paths_to_parse():
     current_directory = os.getcwd()
 
-    files_to_parse = []
+    files_paths_to_parse = []
     for file in os.listdir(current_directory):
         if file.endswith('.gnmap') or file.endswith('.json'):
-            files_to_parse.append(os.path.join(current_directory, file))
+            files_paths_to_parse.append(os.path.join(current_directory, file))
 
-    # If no files found, print a message and exit
-    if not files_to_parse:
-        print("No valid .gnmap or JSON files found in the current directory.", file=sys.stderr)
-        sys.exit(1)
+    return files_paths_to_parse
 
+def get_all_data_from_files(files_paths_to_parse):
     all_data = []
-    for file_path in files_to_parse:
+    for file_path in files_paths_to_parse:
         if file_path.endswith('.gnmap'):
             file_data = parse_grepable_nmap_output(file_path)
             all_data.extend(file_data)
         elif file_path.endswith('.json'):
             file_data = parse_censys_json(file_path)
             all_data.extend(file_data)
+
+    return all_data
+
+def main():
+    files_paths_to_parse = get_files_paths_to_parse()
+    all_data = get_all_data_from_files(files_paths_to_parse)
 
     if not all_data:
         print("No data found to display.", file=sys.stderr)
