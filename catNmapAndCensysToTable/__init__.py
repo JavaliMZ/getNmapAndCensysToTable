@@ -138,7 +138,8 @@ def main():
         print("No data found to display.", file=sys.stderr)
         sys.exit(1)
 
-    print_table(all_data)
+    # print_table(all_data)
+    print("testing")
 
 if __name__ == "__main__":
     main()
