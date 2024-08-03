@@ -6,47 +6,55 @@ import re
 import json
 from tabulate import tabulate
 
+def is_relevant_info_from_line_nmap(line):
+    return not line.startswith('#') or 'Host' in line
+
+def extract_ip_and_ports_from_line_nmap(line):
+    parts = line.split()
+    ip = parts[1]
+
+    if 'Ports:' not in line:
+        return ip, []
+
+    ports_info = line.split('Ports: ')[1]
+    ports = ports_info.split(',')
+
+    return ip, ports
+
+
 def parse_grepable_nmap_output(file_path):
     data = []
     cve_pattern = re.compile(r'CVE-\d{4}-\d+', re.IGNORECASE)
 
-    try:
-        with open(file_path, 'r') as file:
-            for line in file:
-                if line.startswith('#') or 'Host' not in line:
-                    continue
+    with open(file_path, 'r') as file:
+        for line in file:
+            if not is_relevant_info_from_line_nmap(line):
+                continue
+            
+            ip, ports = extract_ip_and_ports_from_line_nmap(line)
+            if not ports:
+                continue
 
-                parts = line.split()
-                ip = parts[1]
 
-                if 'Ports:' not in line:
-                    continue
+            for port_info in ports:
+                port_details = port_info.split('/')
 
-                ports_info = line.split('Ports: ')[1]
-                ports = ports_info.split(',')
+                if len(port_details) >= 7:
+                    port, state, protocol, _, service, _, info = port_details[:7]
 
-                for port_info in ports:
-                    port_details = port_info.split('/')
+                    cves = cve_pattern.findall(info)
+                    cve_string = ', '.join(cves) if cves else 'N/A'
 
-                    if len(port_details) >= 7:
-                        port, state, protocol, _, service, _, info = port_details[:7]
+                    data.append({
+                        'IP': ip,
+                        'Port': port,
+                        'Protocol': protocol.lower(),
+                        'State': state.lower(),
+                        'Service': service.lower(),
+                        'Info': info,
+                        'CVEs': cve_string
+                    })                                                                                                                  
 
-                        cves = cve_pattern.findall(info)
-                        cve_string = ', '.join(cves) if cves else 'N/A'
-
-                        data.append({
-                            'IP': ip,
-                            'Port': port,
-                            'Protocol': protocol.lower(),
-                            'State': state.lower(),
-                            'Service': service.lower(),
-                            'Info': info,
-                            'CVEs': cve_string
-                        })
-    except FileNotFoundError:
-        print(f"File not found: {file_path}", file=sys.stderr)
-    except IOError as e:
-        print(f"Error reading file: {e}", file=sys.stderr)
 
     return data
 
@@ -103,7 +111,11 @@ def get_files_paths_to_parse():
     for file in os.listdir(current_directory):
         if file.endswith('.gnmap') or file.endswith('.json'):
             files_paths_to_parse.append(os.path.join(current_directory, file))
-
+    
+    if not files_paths_to_parse:
+        print("No files found to parse.", file=sys.stderr)
+        sys.exit(1)
+        
     return files_paths_to_parse
 
 def get_all_data_from_files(files_paths_to_parse):
