@@ -144,18 +144,18 @@ class MainController:
     def __init__(self):
         self.file_paths = FileManager.get_files_paths_to_parse()
 
+    def get_data_from_file(self, file_path):
+        if file_path.endswith('.gnmap'):
+            nmap_parser = NmapParser(file_path)
+            return nmap_parser.parse_file()
+        elif file_path.endswith('.json'):
+            censys_parser = CensysParser(file_path)
+            return censys_parser.parse_file()
+
     def get_all_data_from_files(self):
         all_data = []
         for file_path in self.file_paths:
-            if file_path.endswith('.gnmap'):
-                parser = NmapParser(file_path)
-                file_data = parser.parse_file()
-                all_data.extend(file_data)
-            elif file_path.endswith('.json'):
-                parser = CensysParser(file_path)
-                file_data = parser.parse_file()
-                all_data.extend(file_data)
-
+            all_data.extend(self.get_data_from_file(file_path))
         return all_data
 
     def run(self):
