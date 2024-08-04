@@ -168,7 +168,9 @@ class MainController:
         report_generator = ReportGenerator(all_data)
         report_generator.print_table()
 
-
-if __name__ == "__main__":
+def main():
     main_controller = MainController()
     main_controller.run()
+
+if __name__ == "__main__":
+    main()
