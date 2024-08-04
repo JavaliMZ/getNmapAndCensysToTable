@@ -4,12 +4,13 @@ import os
 import sys
 import re
 import json
-from tabulate import tabulate
+from tabulate import tabulate # type: ignore
 
 def is_relevant_info_from_line_nmap(line):
     return not line.startswith('#') or 'Host' in line
 
 def extract_ip_and_ports_from_line_nmap(line):
+    
     parts = line.split()
     ip = parts[1]
 
@@ -21,6 +22,42 @@ def extract_ip_and_ports_from_line_nmap(line):
 
     return ip, ports
 
+def port_details_from_nmap(ip, ports):
+    data = []
+    cve_pattern = re.compile(r'CVE-\d{4}-\d+', re.IGNORECASE)
+
+    for port_info in ports:
+        port_details = port_info.split('/')
+
+        if len(port_details) >= 7:
+            port, state, protocol, _, service, _, info = port_details[:7]
+
+            cves = cve_pattern.findall(info)
+            cve_string = ', '.join(cves) if cves else 'N/A'
+
+            data.append({
+                'IP': ip,
+                'Port': port,
+                'Protocol': protocol.lower(),
+                'State': state.lower(),
+                'Service': service.lower(),
+                'Info': info,
+                'CVEs': cve_string
+            })
+
+    return data
+
+def parse_grepable_nmap_line(line, data):
+    if not is_relevant_info_from_line_nmap(line):
+        return
+
+    ip, ports = extract_ip_and_ports_from_line_nmap(line)
+    if not ports:
+        return
+
+    data.extend(port_details_from_nmap(ip, ports))
+
+
 
 def parse_grepable_nmap_output(file_path):
     data = []
@@ -28,32 +65,7 @@ def parse_grepable_nmap_output(file_path):
 
     with open(file_path, 'r') as file:
         for line in file:
-            if not is_relevant_info_from_line_nmap(line):
-                continue
-            
-            ip, ports = extract_ip_and_ports_from_line_nmap(line)
-            if not ports:
-                continue
-
-
-            for port_info in ports:
-                port_details = port_info.split('/')
-
-                if len(port_details) >= 7:
-                    port, state, protocol, _, service, _, info = port_details[:7]
-
-                    cves = cve_pattern.findall(info)
-                    cve_string = ', '.join(cves) if cves else 'N/A'
-
-                    data.append({
-                        'IP': ip,
-                        'Port': port,
-                        'Protocol': protocol.lower(),
-                        'State': state.lower(),
-                        'Service': service.lower(),
-                        'Info': info,
-                        'CVEs': cve_string
-                    })                                                                                                                  
+            parse_grepable_nmap_line(line, data)                                                                                                                
 
 
     return data
