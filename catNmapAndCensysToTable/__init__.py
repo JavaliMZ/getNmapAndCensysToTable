@@ -155,7 +155,7 @@ class MainController:
     def get_all_data_from_files(self):
         all_data = []
         for file_path in self.file_paths:
-            all_data.extend(self.get_data_from_file(file_path))
+            all_data.extend(self.get_data_from_file(file_path)) # type: ignore
         return all_data
 
     def run(self):
