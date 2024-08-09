@@ -1,10 +1,10 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='catNmapAndCensysToTable',
+    name='getNmapAndCensysToTable',
     version='0.1.1',
-    description='Private package to catNmapAndCensysToTable, a tool to convert Nmap and Censys scans to a table',
-    url='git@github.com:JavaliMZ/catNmapAndCensysToTable.git',
+    description='Private package to getNmapAndCensysToTable, a tool to convert Nmap and Censys scans to a table',
+    url='git@github.com:JavaliMZ/getNmapAndCensysToTable.git',
     author='Sylvain Júlio',
     author_email='syjulio123@gmail.com',
     license='unlicense',
@@ -15,7 +15,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'catNmapAndCensysToTable=catNmapAndCensysToTable:main'
+            'getNmapAndCensysToTable=getNmapAndCensysToTable:main'
         ]
     }
 )
