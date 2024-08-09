@@ -137,7 +137,7 @@ class ReportGenerator:
             [line['IP'], line['Port'], line['Protocol'], line['State'],
              line['Service'], line['Info']] + ([line['CVEs']] if has_cves else []) for line in self.all_data
         ]
-        print(tabulate(table, tablefmt='plain', numalign="left"))
+        print(tabulate(table, tablefmt='presto', numalign="left"))
 
 
 class MainController:
