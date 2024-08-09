@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='getNmapAndCensysToTable',
-    version='0.1.1',
+    version='1.0.0',
     description='Private package to getNmapAndCensysToTable, a tool to convert Nmap and Censys scans to a table',
     url='git@github.com:JavaliMZ/getNmapAndCensysToTable.git',
     author='Sylvain Júlio',
