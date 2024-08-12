@@ -138,7 +138,7 @@ class ReportGenerator:
         table = [
             [
                 colored(line['IP'], "magenta"), 
-                colored(line['Port'], "cyan"), 
+                line['Port'], 
                 colored(line['Protocol'], "green"),
                 line['State'],
                 colored(line['Service'], "yellow"), 
