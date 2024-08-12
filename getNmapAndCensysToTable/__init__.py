@@ -5,6 +5,7 @@ import sys
 import re
 import json
 from tabulate import tabulate  # type: ignore
+from termcolor import colored  # type: ignore
 
 
 class NmapParser:
@@ -127,6 +128,7 @@ class ReportGenerator:
         self.all_data = all_data
 
     def print_table(self):
+            # [colored(host, "green"), colored(ip, "magenta"), colored(port, "cyan"), not_before, not_after, execute_tls_scan(host)]
         has_cves = any('CVEs' in entry and entry['CVEs'] != 'N/A' for entry in self.all_data)
         headers = ['IP', 'Port', 'Protocol', 'State', 'Service', 'Info']
 
@@ -134,8 +136,14 @@ class ReportGenerator:
             headers.append('CVEs')
 
         table = [
-            [line['IP'], line['Port'], line['Protocol'], line['State'],
-             line['Service'], line['Info']] + ([line['CVEs']] if has_cves else []) for line in self.all_data
+            [
+                colored(line['IP'], "magenta"), 
+                colored(line['Port'], "cyan"), 
+                colored(line['Protocol'], "green"),
+                line['State'],
+                colored(line['Service'], "yellow"), 
+                line['Info']
+            ] + ([line['CVEs']] if has_cves else []) for line in self.all_data
         ]
         print(tabulate(table, tablefmt='presto', numalign="left"))
 
